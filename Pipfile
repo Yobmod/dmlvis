@@ -1,0 +1,33 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+cython = "*"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-sugar = "*"
+pytest-xdist = "*"
+pylama = "*"
+autopep8 = "*"
+# flake8 = "*"
+pdbpp = "*"
+
+
+[packages]
+opencv-python = "*" # brings numpy
+matplotlib = "*"  # brings numpy
+# typing-extensions = "*"
+pillow = "*"
+imutils = "*"
+pysimplegui = "*"
+# pyyaml = ">=4.2"
+# python-dotenv = "*"
+# boltons = "*"
+# keras = "*"
+# sklearn = "*"
+
+[requires]
+python_version = "3.7"
