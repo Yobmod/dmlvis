@@ -6,11 +6,12 @@ import cv2
 import math
 import imutils
 import pathlib
+from PIL import Image, ImageFont, ImageDraw
 from functools import lru_cache
 
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
-from mytypes import imageType, contourType, pointType, intArray
+from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
 
 
 def set_res(cap: cv2.VideoCapture, resolution: Union[int, str]) -> str:
@@ -194,3 +195,21 @@ def add_image_text(image: imageType, text: str, underline: bool = False) -> imag
         cv2.line(text_image, under_start_pos, under_finish_pos, under_color, under_line_thick)
 
     return text_image
+
+
+def annot_image(img: imageType, ang: float, txt_size: int = 10) -> None:
+    """convert opencv image array to PIL image, then annotate with contact angle"""
+
+    pil_im_grey: PILImage = Image.fromarray(img)
+    pil_im_color: PILImage = pil_im_grey.convert('RGB')  # needed to draw color text onto
+    text_color: colorType = (255, 255, 0)
+    text_position = (10, 10)
+    text_size = txt_size
+    texty = f"C. angle = {ang:.1f}"
+    try:
+        font: ImageFont.FreeTypeFont = ImageFont.truetype(R'/Library/Fonts/Arial.ttf', text_size)
+    except IOError:
+        font = ImageFont.load_default()
+    draw = ImageDraw.Draw(pil_im_color)
+    draw.text(text_position, texty, font=font, fill=text_color)
+    pil_im_color.save(R'.\data\ceria_annotated.bmp')

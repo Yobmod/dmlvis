@@ -1,11 +1,11 @@
 """."""
 # -*- coding: utf-8 -*-
 import cv2
-from PIL import Image, ImageFont, ImageDraw
 
-from dmlutils import get_outlined_image, crop_outlined_image, get_contour_lims, calc_contact_angle  # set_res
 
-from typing import Type, NewType 
+from dmlutils import get_outlined_image, crop_outlined_image, get_contour_lims, calc_contact_angle, annot_image  # set_res
+
+from typing import Type, NewType
 from mytypes import imageType, colorType, PILImage
 
 
@@ -15,7 +15,7 @@ img: imageType = cv2.imread(R'.\data\ceria.png', cv2.IMREAD_COLOR)  # cv2.IMREAD
 
 while img is not None:  # and img.any():
 
-    cv2.imshow('test image', img) 
+    cv2.imshow('test image', img)
 
     key: int = cv2.waitKey(0) & 0xFF
 
@@ -29,29 +29,16 @@ while img is not None:  # and img.any():
         ang = calc_contact_angle(w, h)
         # annotated = add_image_text(mask, f"C. angle = {ang:.1f}")
         # cv2.imwrite(R'.\data\test_annotated.png', annotated)
-        pil_im_grey: PILImage = Image.fromarray(mask)
-        pil_im_color: PILImage = pil_im_grey.convert('RGB')  # needed to draw color text onto
-        text_color: colorType = (255, 255, 0)
-        text_position = (10, 10)
-        text_size = 10
-        texty = f"C. angle = {ang:.1f}"
-        # reveal_locals()
 
-        try:
-            font: ImageFont.FreeTypeFont = ImageFont.truetype(R'/Library/Fonts/Arial.ttf', text_size)
-        except IOError:
-            font = ImageFont.load_default()
-        draw = ImageDraw.Draw(pil_im_color)
-        draw.text(text_position, texty, font=font, fill=text_color)
-        pil_im_color.save(R'.\data\ceria_annotated.bmp')
+        annot_image(mask, ang, txt_size=10)
         print("image processing done")
 
     elif key == 27 or key == ord("q"):         # wait for ESC key or Q to exit
         break
 else:
-    print("Image not loaded...") 
+    print("Image not loaded...")
 
-cv2.destroyAllWindows() 
+cv2.destroyAllWindows()
 
 # gray: np.ndarray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 # 0=vert, 1=horiz, -1=both       # Display the resulting frame

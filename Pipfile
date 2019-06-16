@@ -15,7 +15,6 @@ autopep8 = "*"
 # flake8 = "*"
 pdbpp = "*"
 
-
 [packages]
 opencv-python = "*" # brings numpy
 matplotlib = "*"  # brings numpy
@@ -23,6 +22,7 @@ matplotlib = "*"  # brings numpy
 pillow = "*"
 imutils = "*"
 pysimplegui = "*"
+pyinstaller = "*"
 # pyyaml = ">=4.2"
 # python-dotenv = "*"
 # boltons = "*"
