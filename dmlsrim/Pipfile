@@ -1,0 +1,31 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+matplotlib = "*"
+typing-extensions = "*"
+pillow = "*"
+pysrim = "*"
+
+[dev-packages]
+pipenv = "*"
+pytest-cov = "*"
+pytest-sugar = "*"
+pytest-xdist = "*"
+pyinstaller = "*"
+pylama = "*"
+flake8 = "*"
+mypy = "*"
+autopep8 = "*"
+cython = "*"
+v = {editable = true,version = "*"}
+black = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
