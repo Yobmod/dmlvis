@@ -12,8 +12,9 @@ pytest-sugar = "*"
 pytest-xdist = "*"
 pylama = "*"
 autopep8 = "*"
-# flake8 = "*"
+flake8 = "*"
 pdbpp = "*"
+# numpy-stubs = {editable = true,git = "https://github.com/numpy/numpy-stubs.git"}
 
 [packages]
 opencv-python = "*" # brings numpy
@@ -28,6 +29,7 @@ pyinstaller = "*"
 # boltons = "*"
 # keras = "*"
 # sklearn = "*"
+numpy = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.7"  # 3.7 for opencv

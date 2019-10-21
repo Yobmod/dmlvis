@@ -12,7 +12,7 @@ from functools import lru_cache
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
 from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
-
+ 
 
 def set_res(cap: cv2.VideoCapture, resolution: Union[int, str]) -> str:
     """."""

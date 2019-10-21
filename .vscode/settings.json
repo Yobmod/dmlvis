@@ -1,7 +1,10 @@
 {
-    "python.pythonPath": "C:\\Users\\laventin.LANCS\\.virtualenvs\\dmlvis-S9R8jaT6\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Users\\Customer\\.virtualenvs\\dmlvis-S9R8jaT6\\Scripts\\python.exe",
     "python.linting.enabled": true,
     "python.linting.mypyEnabled": true,
     "python.linting.pylamaEnabled": true,
-    "python.linting.flake8Enabled": true
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+
+    "mypy.executable": "C:/dev/.mypyls/Scripts/mypyls.exe"
 }
