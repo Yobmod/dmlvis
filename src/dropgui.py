@@ -1,3 +1,5 @@
+"""GUI"""
+
 import PySimpleGUI as sg
 import sys
 

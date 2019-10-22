@@ -1,10 +1,21 @@
 {
-    "python.pythonPath": "C:\\Users\\Customer\\.virtualenvs\\dmlvis-S9R8jaT6\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Users\\laventin.LANCS\\.virtualenvs\\dmlvis-S9R8jaT6\\Scripts\\python.exe",
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
     "python.linting.enabled": true,
     "python.linting.mypyEnabled": true,
     "python.linting.pylamaEnabled": true,
-    "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
-
-    "mypy.executable": "C:/dev/.mypyls/Scripts/mypyls.exe"
+    "python.jediEnabled": false,
+    "python.analysis.disabled": [
+        "inherit-non-class"
+    ],
+    "python.autoComplete.extraPaths": ["./src"],
+    "code-runner.executorMap": {
+        "javascript": "node",
+        "python": "C:\\Users\\laventin.LANCS\\.virtualenvs\\dmltests-4uyn6NvJ\\Scripts\\python.exe",
+        "html": "\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\"",
+        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+    }
 }

@@ -1,4 +1,4 @@
-"""."""
+"""functions for image manipulation and processing"""
 # -*- coding: utf-8 -*-
 from datetime import datetime
 import numpy as np
@@ -197,7 +197,7 @@ def add_image_text(image: imageType, text: str, underline: bool = False) -> imag
     return text_image
 
 
-def annot_image(img: imageType, ang: float, txt_size: int = 10) -> None:
+def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: str = ".") -> None:
     """convert opencv image array to PIL image, then annotate with contact angle"""
 
     pil_im_grey: PILImage = Image.fromarray(img)
@@ -212,4 +212,4 @@ def annot_image(img: imageType, ang: float, txt_size: int = 10) -> None:
         font = ImageFont.load_default()
     draw = ImageDraw.Draw(pil_im_color)
     draw.text(text_position, texty, font=font, fill=text_color)
-    pil_im_color.save(R'.\data\ceria_annotated.bmp')
+    pil_im_color.save(save_path)

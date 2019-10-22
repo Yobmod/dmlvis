@@ -1,4 +1,4 @@
-"""."""
+"""droplet image recogntion from stream"""
 import cv2
 
 from dmlutils import set_res, save_image_groups
