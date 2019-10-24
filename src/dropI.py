@@ -66,5 +66,6 @@ def display_image_from_path(path: Union[str, Path]) -> Optional[imageType]:
         return None
 
 
-process_image_from_path(R'..\data\ceria.png', "ce2")
-display_image_from_path(R'..\data\ceria.png')
+if __name__ == '__main__':
+    process_image_from_path(R'..\data\ceria.png', "ce2")
+    display_image_from_path(R'..\data\ceria.png')
