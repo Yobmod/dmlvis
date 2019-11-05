@@ -72,11 +72,3 @@ def display_image_from_path(path: Union[str, Path]) -> Optional[imageType]:
     else:
         print("Image not loaded...")
         return None
-
-
-<<<<<<< HEAD
-=======
-if __name__ == '__main__':
-    process_image_from_path(R'..\data\ceria.png', "ce2")
-    display_image_from_path(R'..\data\ceria.png')
->>>>>>> 453d3ec0f43c46a222a41fee1e45b746b3f6b0a2
