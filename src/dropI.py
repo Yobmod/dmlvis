@@ -3,28 +3,36 @@
 import cv2
 from pathlib import Path
 
-from dmlutils import get_outlined_image, crop_outlined_image, get_contour_lims, calc_contact_angle, annot_image  # set_res
+import imutils
+from dmlutils import get_outlined_image, crop_outlined_image, get_contour_lims, calc_contact_angle, annot_image, get_image_skew
 
-from typing import Type, NewType, Union, Optional
+from typing import Type, NewType, Union, Optional, Tuple
 from mytypes import imageType, colorType, PILImage
 
 
-def process_image(img: imageType, name: str) -> None:
+def process_image(img: imageType, name: str, save_images: bool = True, verbosity: int = 0) -> Tuple[float, float, float]:
 
     edged = get_outlined_image(img)
-    mask = crop_outlined_image(edged)
-    cv2.imwrite(Rf'..\data\{name}_edged.png', edged)
-    cv2.imwrite(Rf'..\data\{name}_masked.png', mask)
-    (x, y, w, h) = get_contour_lims(edged)
-    ang = calc_contact_angle(w, h)
-    # annotated = add_image_text(mask, f"C. angle = {ang:.1f}")
-    # cv2.imwrite(R'.\data\test_annotated.png', annotated)
-    annot_image(mask, ang, txt_size=10, save_path=Rf'..\data\{name}_annotated.bmp')
-    print("image processing done")
+    rotated = imutils.rotate_bound(edged, -90)
+    skew = get_image_skew(rotated)
+    fixed = imutils.rotate_bound(edged, -skew)
+    (x, y, w, h) = get_contour_lims(fixed)
+    angle: float = calc_contact_angle(w, h)
+
+    if save_images:
+        cv2.imwrite(Rf'..\data\{name}_edged.png', edged)
+        mask = crop_outlined_image(edged)
+        cv2.imwrite(Rf'..\data\{name}_masked.png', mask)
+        annot_image(mask, angle, txt_size=10, save_path=Rf'..\data\{name}_annotated.bmp')
+        # annotated = add_image_text(mask, f"C. angle = {ang:.1f}")
+        # cv2.imwrite(R'.\data\test_annotated.png', annotated)
+    if verbosity > 0:
+        print("image processing done")
+    return (w, h, angle)
 
 
-def process_image_from_path(path: Union[str, Path], name: str = None) -> Optional[imageType]:
-    """tries to load image from path. If successful, processes and saves images, and returns original image"""
+def process_image_from_path(path: Union[str, Path], name: str = None) -> Optional[Tuple[float, float, float]]:
+    """tries to load image from path. If successful, processes and saves images, and returns width, height, contact angle as Tuple"""
     if name is not None:
         name_from_path = name
     else:
@@ -35,8 +43,8 @@ def process_image_from_path(path: Union[str, Path], name: str = None) -> Optiona
 
     if img_from_path is not None:
         print("image loaded")
-        process_image(img_from_path, name_from_path)
-        return img_from_path
+        angle = process_image(img_from_path, name_from_path)
+        return angle
     else:
         print("Image not loaded...")
         return None
@@ -66,6 +74,9 @@ def display_image_from_path(path: Union[str, Path]) -> Optional[imageType]:
         return None
 
 
+<<<<<<< HEAD
+=======
 if __name__ == '__main__':
     process_image_from_path(R'..\data\ceria.png', "ce2")
     display_image_from_path(R'..\data\ceria.png')
+>>>>>>> 453d3ec0f43c46a222a41fee1e45b746b3f6b0a2

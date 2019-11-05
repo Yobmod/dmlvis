@@ -12,7 +12,7 @@ from functools import lru_cache
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
 from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
- 
+
 
 def set_res(cap: cv2.VideoCapture, resolution: Union[int, str]) -> str:
     """."""
@@ -92,7 +92,7 @@ def drop_params(w: int, h: int) -> float:
 
 # @lru_cache(maxsize=128, typed=True)
 def get_image_skew(frame: imageType) -> float:
-    """find contours in an edged image, create a mask sized to largest contour and apply to image"""
+    """find contours in an edged image, and calculate angle from horizontal"""
     largest_contour = get_largest_contour(frame)
     if largest_contour is not None:
         point: pointType
@@ -213,3 +213,86 @@ def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: str =
     draw = ImageDraw.Draw(pil_im_color)
     draw.text(text_position, texty, font=font, fill=text_color)
     pil_im_color.save(save_path)
+
+
+def savitzky_golay(y: Union[List, 'np._ArrayLike[float]'], window_size: int, order: int, deriv: int = 0, rate: int = 1) -> np.ndarray:
+    r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    The Savitzky-Golay filter removes high frequency noise from data. It has the advantage of preserving the original shape and
+    features of the signal better than other types of filtering approaches, such as moving averages techniques.
+
+    Parameters
+    ----------
+    y : array_like, shape (N,) the values of the time history of the signal.
+    window_size : int,  the length of the window. Must be an odd integer number.
+    order : int the order of the polynomial used in the filtering.Must be less then `window_size` - 1.
+    deriv: intthe order of the derivative to compute (default = 0 means only smoothing)
+
+    Returns
+    -------
+    ys : ndarray, shape (N)
+        the smoothed signal (or it's n-th derivative).
+
+    Notes
+    -----
+    The Savitzky-Golay is a type of low-pass filter, particularly
+    suited for smoothing noisy data. The main idea behind this
+    approach is to make for each point a least-square fit with a
+    polynomial of high order over a odd-sized window centered at
+    the point.
+    Examples
+    --------
+    t = np.linspace(-4, 4, 500)
+    y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
+    ysg = savitzky_golay(y, window_size=31, order=4)
+    import matplotlib.pyplot as plt
+    plt.plot(t, y, label='Noisy signal')
+    plt.plot(t, np.exp(-t**2), 'k', lw=1.5, label='Original signal')
+    plt.plot(t, ysg, 'r', label='Filtered signal')
+    plt.legend()
+    plt.show()
+    References
+    ----------
+    .. [1] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
+       Data by Simplified Least Squares Procedures. Analytical
+       Chemistry, 1964, 36 (8), pp 1627-1639.
+    .. [2] Numerical Recipes 3rd Edition: The Art of Scientific Computing
+       W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+       Cambridge University Press ISBN-13: 9780521880688
+    """
+    import numpy as np
+    from math import factorial
+
+    # convert to array if list or tuple
+    if isinstance(y, (list, tuple)):
+        y = np.array(y)
+    try:
+        window_size = np.abs(np.int(window_size))
+        order = np.abs(np.int(order))
+    except ValueError:
+        raise ValueError("window_size and order have to be of type int")
+
+    if window_size < 1:
+        raise TypeError("window_size size must be a positive odd number")
+
+    if window_size % 2 != 1:
+        window_size += 1
+        print("window_size size must be a positive odd number, incremented by 1")
+ 
+    if window_size < order + 2:
+        raise TypeError("window_size is too small for the polynomials order")
+
+    order_range = range(order + 1)
+    half_window = (window_size - 1) // 2
+    # precompute coefficients
+    b = np.mat([[k**i for i in order_range] for k in range(-half_window, half_window + 1)])
+    m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
+    # pad the signal at the extremes with
+    # values taken from the signal itself
+
+    win_begin: float = cast(float, y[0])
+    win_end: float = cast(float, y[-1])
+    firstvals = win_begin - np.abs(y[1:half_window + 1][::-1] - win_begin)
+    lastvals = win_end + np.abs(y[-half_window - 1:-1][::-1] - win_end)
+    y = np.concatenate((firstvals, y, lastvals))
+    z: np.ndarray = np.convolve(m[::-1], y, mode='valid')
+    return z

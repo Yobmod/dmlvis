@@ -1,4 +1,5 @@
 tokens.env
+/data
 
 .mypy_cache/
 .pytest_cache/
