@@ -261,10 +261,13 @@ def savitzky_golay(y: Union[List, 'np._ArrayLike[float]'], window_size: int, ord
     """
     import numpy as np
     from math import factorial
-
+    print(y)
+    print(y[0])
     # convert to array if list or tuple
     if isinstance(y, (list, tuple)):
         y = np.array(y)
+        print(y)
+        print(y[0])
     try:
         window_size = np.abs(np.int(window_size))
         order = np.abs(np.int(order))

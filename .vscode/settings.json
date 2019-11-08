@@ -55,7 +55,7 @@
         
             "editor.fontSize": 16,
         
-            "workbench.colorTheme": "Monokai Vibrant",
+            "workbench.colorTheme": "Monokai-Contrast",
             "git.enableSmartCommit": true,
             "git.confirmSync": false,
             "git.autofetch": true,
