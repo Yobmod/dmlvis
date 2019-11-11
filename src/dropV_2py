@@ -25,7 +25,7 @@ from scipy.signal import medfilt, filtfilt, butter, ellip
 from typing import NamedTuple
 
 
-def process_video(vid: videoType, show: bool = True, manual: bool = False) -> np.ndarray:
+def process_video(vid: videoType, manual: bool = False) -> np.ndarray:
     fps: int = vid.get(cv2.CAP_PROP_FPS)      # OpenCV2 version 2 used "CV_CAP_PROP_FPS"
     # frameCount = int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
     # duration = frameCount / fps  # seconds
@@ -58,8 +58,7 @@ def process_video(vid: videoType, show: bool = True, manual: bool = False) -> np
 
         if ret is True:
 
-            if show:
-                cv2.imshow('image window', frame)
+            cv2.imshow('image window', frame)
 
             key: int = cv2.waitKey(10) & 0xFF
 
@@ -77,7 +76,7 @@ def process_video(vid: videoType, show: bool = True, manual: bool = False) -> np
                 CA_list.append(angle)
                 W_list.append(w)
                 H_list.append(h)
-                frame_time = round(frame_no / fps, 2)
+                frame_time = frame_no / fps
                 frame_nos.append(frame_no)
                 vid_times.append(frame_time)
                 frame_no += 1
@@ -112,32 +111,16 @@ def process_video(vid: videoType, show: bool = True, manual: bool = False) -> np
 
 def process_videodata(raw_data: 'np.ndarray[float]', flatten: Literal['high', 'med', 'low'] = 'med') -> 'np.ndarray[float]':
     """process raw_data from video (as a 5 row ndarray) and return a 9 column array"""
-
-    # check if width (raw[2]) makes sense, else remove all data for that frame
-    for i, num in enumerate(raw_data[2]):
-        if num > 130:
-            raw_data[2:7, i] = np.NaN
-
-    # if CA greater than 80o remove
-    for i, num in enumerate(raw_data[4]):
-        if num > 80:
-            raw_data[4, i] = np.NaN
-
-    # drop the first minute
-    for i, num in enumerate(raw_data[1]):
-        if num <= 60:
-            raw_data[1, i] = np.NaN
-
-    # drop any row contain NaN width or CA. Shape is (5, xxx)
-    raw_data = raw_data[:, ~np.any(np.isnan(raw_data), axis=0)]
-
-    # check any data processed. Note CA_list has NaN replacements mutated above.
-    if len(raw_data) < 5:
-        raise ValueError("Not enough data ro process ...")
-
     CA_list = raw_data[4]
     if len(CA_list) <= 0:
         raise ValueError("No data produced...")
+
+    # if greater than 10% change, flatten
+    for i, num in enumerate(CA_list):
+        if CA_list[i] < 0.8 * CA_list[i - 1]:
+            CA_list[i] = CA_list[i + 1]
+        if num >= 80.0:
+            CA_list[i] = 80.0  # np.NaN
 
     if flatten == 'high':
         (b, a) = butter(1, 0.01)
@@ -147,14 +130,17 @@ def process_videodata(raw_data: 'np.ndarray[float]', flatten: Literal['high', 'm
         (b, a) = butter(1, 0.05)
 
     try:
+        # butterworth filter  # N 1-10 (higer = more), Wn 0.01-0.1 (smaller = more filter)
+        CA_butterfilt: 'np.ndarray[float]' = filtfilt(b, a, CA_list, padlen=None)
+        assert len(CA_butterfilt) == len(CA_list)
+
+        CA_gustfilt: 'np.ndarray[float]' = filtfilt(b, a, CA_list)  # , method="gust")
+        assert len(CA_gustfilt) == len(CA_list)
+
         # median window filtered
         # kernal_size is length of sub-data used as median. Bigger == more filtered
         CA_medfilt: 'np.ndarray[float]' = medfilt(CA_list, kernel_size=11)
         assert len(CA_medfilt) == len(CA_list)
-
-        # butterworth filter  # N 1-10 (higer = more), Wn 0.01-0.1 (smaller = more filter)
-        CA_butterfilt: 'np.ndarray[float]' = filtfilt(b, a, CA_medfilt)  # padtype=xxx, padlen=None)
-        assert len(CA_butterfilt) == len(CA_list)
 
         # savitzky_golay filter
         CA_smoothed: 'np.ndarray[float]' = savitzky_golay(CA_medfilt, window_size=101, order=3)
@@ -164,7 +150,7 @@ def process_videodata(raw_data: 'np.ndarray[float]', flatten: Literal['high', 'm
         print("Not enough data for smoothing. Leave processing for long (e.g. 10+ seconds)")
         raise
 
-    data: 'np.ndarray[float]' = np.vstack((raw_data, CA_medfilt, CA_smoothed, CA_butterfilt)).transpose()
+    data: 'np.ndarray[float]' = np.vstack((raw_data, CA_medfilt, CA_smoothed, CA_butterfilt, CA_gustfilt)).transpose()
     return data
 
 
@@ -173,7 +159,7 @@ def print_video_data(data: 'np.ndarray[float]',
                      out_filename: str = "out",
                      combine: bool = True,
                      dots: Collection = "raw, medfilt",
-                     lines: Collection = "smooth, butter",
+                     lines: Collection = "smooth, butter, gust",
                      sparse: Tuple[str, int] = ("raw, medfilt", 10)
                      ) -> None:
     """sparse only plots the xth value for given arrays"""
@@ -190,62 +176,108 @@ def print_video_data(data: 'np.ndarray[float]',
     out_file = out_folder_path.joinpath(out_filename + ".csv")
 
     # sav data array
-    headers = "frame, time, width, height, contact angles, CA_medfiltered, CA_smoothed, CA_butterfilt"
+    headers = "frame, time, width, height, contact angles, CA_medfiltered, CA_smoothed, CA_butterfilt, CA_gustfilt"
     print(data.shape)
     assert len(headers.split(",")) == data.shape[1]  # horizontal
     np.savetxt(out_file, data, delimiter=",", header=headers)  # np required by cv2, so may as well use it
     print(f"Results file saved to {out_file}")
 
-    vid_time: "np.ndarray[float]" = data[:, 1]
+    vid_time = data[:, 1]
     raw_data: "np.ndarray[float]" = data[:, 4]
-    medfilt_data: "np.ndarray[float]" = data[:, 5]
-    smoothed_data: "np.ndarray[float]" = data[:, 6]
-    butterfiltered: "np.ndarray[float]" = data[:, 7]
+    medfilt_data = data[:, 5]
+    smoothed_data = data[:, 6]
+    butterfiltered = data[:, 7]
+    gustfiltered = data[:, 8]
 
     # TODO: plot graph based on raw,
     # show raw as lines or dots or not
     # optional add filtered lines
 
-    def plot_graph(data: "np.ndarray[float]", file_suffix: str, color: str = 'b', combine: bool = combine) -> None:
-        from numpy.polynomial import polynomial as P
-        lsf_coeffs = P.polyfit(vid_time, data, deg=5)
-        lsf_data = P.polyval(vid_time, lsf_coeffs)
-        assert len(lsf_data) == len(data)
-
+    def plot_graph(data: "np.ndarray[float]", file_suffix: str, combine: bool = combine) -> None:
         file_name = out_folder_path.joinpath(out_filename + file_suffix)
-        plt.plot(vid_time, data, linestyle='None', color=color, marker="o", markersize=2.0)
-        plt.plot(vid_time, lsf_data, linestyle='solid', linewidth=1, color=color, marker='')
-
+        plt.plot(vid_time, raw_data)
         plt.ylim(0, 90)
         plt.suptitle('Contact angle vs Time')
         plt.xlabel('Time (s)')
         plt.ylabel('Contact angle (\u00B0)')
         plt.savefig(file_name, format="png", bbox_inches="tight", tranparent=True)
-        plt.close()
         print(f"Graph saved to {file_name}")
 
-    # combined_graph = out_folder_path.joinpath(out_filename + "_combined.png")
+    combined_graph = out_folder_path.joinpath(out_filename + "_combined.png")
     # plot and save graphs
 
     if "raw" in lines:
         plot_graph(data=raw_data, file_suffix="_raw.png")
 
     if "medfilt" in lines or "medfilt" in dots:
-        plot_graph(data=medfilt_data, file_suffix="_medianfiltered.png", color='g')
+        if combine:
+            file_name = combined_graph
+            plt.figure(0)
+        else:
+            # plt.figure(2)
+            file_name = out_folder_path.joinpath(out_filename + "_medianfiltered.png")
+        if "raw" in lines:
+            plt.plot(vid_time, medfilt_data)
+        if "raw" in dots:
+            plt.scatter(vid_time, medfilt_data)
+        plt.ylim(0, 90)
+        plt.suptitle('Contact angle vs Time')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Contact angle (\u00B0)')
+        plt.savefig(file_name, format="png", bbox_inches="tight", tranparent=True)
+        print(f"Graph saved to {file_name}")
 
     if "smooth" in lines:
-        plot_graph(data=smoothed_data, file_suffix="_smoothed.png", color='m')
+        if combine:
+            plt.figure(0)
+            file_name = combined_graph
+        else:
+            # plt.figure(3)
+            file_name = out_folder_path.joinpath(out_filename + "_smoothed.png")
+        plt.plot(vid_time, smoothed_data)
+        plt.ylim(0, 90)
+        plt.suptitle('Contact angle vs Time')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Contact angle (\u00B0)')
+        plt.savefig(file_name, format="png", bbox_inches="tight", tranparent=True)
+        print(f"Graph saved to {file_name}")
 
     if "butter" in lines:
-        plot_graph(data=butterfiltered, file_suffix="_buttered.png", color="r")
+        if combine:
+            file_name = combined_graph
+            plt.figure(0)
+        else:
+            plt.figure(4)
+            file_name = out_folder_path.joinpath(out_filename + "_buttered.png")
+        plt.plot(vid_time, butterfiltered)
+        plt.ylim(0, 90)
+        plt.suptitle('Contact angle vs Time')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Contact angle (\u00B0)')
+        plt.savefig(file_name, format="png", bbox_inches="tight", tranparent=True)
+        print(f"Graph saved to {file_name}")
+
+    if "gust" in lines:
+        if combine:
+            plt.figure(0)
+            file_name = combined_graph
+        else:
+            plt.figure(5)
+            file_name = out_folder_path.joinpath(out_filename + "_gusted.png")
+        plt.plot(vid_time, gustfiltered)
+        plt.ylim(0, 90)
+        plt.suptitle('Contact angle vs Time')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Contact angle (\u00B0)')
+        plt.savefig(file_name, format="png", bbox_inches="tight", tranparent=True)
+        print(f"Graph saved to {file_name}")
 
 
 def print_video_data_from_csv(file_in: Union[str, Path],
                               out_path: Union[str, Path] = None,
                               out_filename: str = "out",
-                              *,
                               combine: bool = False,
-                              lines: Collection[str] = "smooth, buttered",
+                              lines: Collection[str] = "smooth, buttered, gust",
                               dots: Collection[str] = "raw, medfilt",
                               delimiter: str = ','
                               ) -> None:
@@ -260,11 +292,10 @@ def print_video_data_from_csv(file_in: Union[str, Path],
         delim = delimiter
 
     data_array = np.loadtxt(file_in, delimiter=delim)
-    print_video_data(data_array, out_path, out_filename, combine=combine, lines=lines, dots=dots)
+    print_video_data(data_array, out_path, out_filename, combine, lines, dots)
 
 
 def process_video_from_path(path: Union[str, Path],
-                            show: bool = True,
                             manual: bool = False
                             ) -> np.ndarray:
 
@@ -279,17 +310,16 @@ def process_video_from_path(path: Union[str, Path],
     else:
         sys.exit("Error: Video file not found...")
 
-    data_array = process_video(vid, show=show, manual=manual)
+    data_array = process_video(vid, manual=manual)
     return data_array
 
 
 def process_videos_from_dirs(in_path: Union[str, Path],
                              out_path: Union[str, Path] = "",
                              *,
-                             lines: Collection = "smooth, butter",
+                             lines: Collection = "smooth, butter, gust",
                              dots: Collection = "raw, medfilt",
                              flatten: Literal["low", "med", "high"] = "med",
-                             show: bool = True,
                              manual: bool = False,
                              combine: bool = False,
                              ) -> None:
@@ -304,21 +334,17 @@ def process_videos_from_dirs(in_path: Union[str, Path],
         out_path = Path(out_path)
 
     # get all .avi files from folder and sub-folders as Paths
-    for video_path in in_path.glob('**/*.mp4'):
+    for video_path in in_path.glob('**/*.avi'):
         video_stem = video_path.stem
-        raw_data = process_video_from_path(video_path, show=show, manual=manual)
+        raw_data = process_video_from_path(video_path, manual=manual)
         processed_data = process_videodata(raw_data, flatten=flatten)
         print_video_data(processed_data, out_path=data_path / 'out', out_filename=video_stem, combine=combine, lines=lines, dots=dots)
 
 
 if __name__ == "__main__":
+    print("aaa")
     data_path = Path(R'..\data')
-    process_videos_from_dirs(data_path, data_path / "out",
-                             lines="raw, medfilt, butter, smooth",
-                             dots="",
-                             flatten='high',
-                             show=True,
-                             combine=False)
+    process_videos_from_dirs(data_path, data_path / "out", lines="butter", dots="", combine=False)
 
     # video_path = Path(R'..\data\thoria 300c dry 70.avi')
     # video_stem = video_path.stem

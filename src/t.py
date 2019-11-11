@@ -1,32 +1,17 @@
-from typing import List, Tuple, Set, Sequence, MutableSequence, Collection, Dict
+import numpy as np
 
+lhi = [1, 4, 6, 3, 8, 90, 101, 56, 32]
+arr = np.array(lhi, dtype=float)
 
-l: List[str] = ["aaa", "bbb", "ccc"]
-t: Tuple[str, str, str] = ("aaa", "bbb", "ccc")
+for i, x in enumerate(arr):
+    if x > 80:
+        print(x)
+        arr[i] = np.NaN
 
-s: Set[str] = {"aaa", "bbb", "ccc"}
+print(arr)
 
-seq: Sequence[str] = ["aaa", "bbb", "ccc"]
-coll: Collection[str] = ["aaa", "bbb", "ccc"]
-dic: Dict[str, bool] = {"aaa": True, "bbb": False, "ccc": True}
-
-for x in "str":
-    print(x)
-
-for x in l:
-    print(x)
-
-for x in t:
-    print(x)
-
-for x in s:
-    print(x)
-
-for x in seq:
-    print(x)
-
-for x in dic:
-    print(x)
-
-for x in seq:
-    print(x)
+"""
+for x in arr:
+    if x > 80:
+        arr[x] = np.NaN
+"""

@@ -73,12 +73,16 @@ def get_contour_lims(frame: imageType) -> Tuple[int, int, int, int]:
 
 def calc_contact_angle(w: int, h: int) -> float:
     drop_h: float = h / 2
-    radius: float = (drop_h / 2) + ((w * w) / (8 * drop_h))
-    opp = radius - drop_h
-    hyp = radius
-    sin_ca = opp / hyp
-    ca: float = 90 - math.degrees(math.asin(sin_ca))
-    # print(f"drop_h={drop_h}, drop_w={w}, model_rad={radius}, angle={ca}")
+    if drop_h > 0:
+        radius: float = (drop_h / 2) + ((w * w) / (8 * drop_h))
+        opp = radius - drop_h
+        hyp = radius
+        sin_ca = opp / hyp
+        ca: float = 90 - math.degrees(math.asin(sin_ca))
+    else:
+        radius = 0.0  # and opp = 0
+        ca = 0
+    print(f"drop_h={drop_h}, drop_w={w}, model_rad={radius}, angle={ca}")
     return ca
 
 
@@ -280,7 +284,7 @@ def savitzky_golay(y: Union[List, 'np._ArrayLike[float]'], window_size: int, ord
     if window_size % 2 != 1:
         window_size += 1
         print("window_size size must be a positive odd number, incremented by 1")
- 
+
     if window_size < order + 2:
         raise TypeError("window_size is too small for the polynomials order")
 
@@ -299,3 +303,38 @@ def savitzky_golay(y: Union[List, 'np._ArrayLike[float]'], window_size: int, ord
     y = np.concatenate((firstvals, y, lastvals))
     z: np.ndarray = np.convolve(m[::-1], y, mode='valid')
     return z
+
+
+def zoom_image(img: imageType, zoom: float) -> imageType:
+        # get the webcam image size
+    height, width, channels = image.shape
+
+    # prepare the crop
+    centerX, centerY = int(height / 2), int(width / 2)
+    radiusX, radiusY = int(zoom * height / 100), int(zoom * width / 100)
+
+    minX, maxX = centerX - radiusX, centerX + radiusX
+    minY, maxY = centerY - radiusY, centerY + radiusY
+
+    cropped = img[minX:maxX, minY:maxY]
+    resized_cropped = cv2.resize(cropped, (width, height))
+
+    cv2.imshow('my webcam', resized_cropped)
+
+
+def zoom_imagefrom_path(path: Union[Path, str], zoom: float) -> imageType:
+
+
+def zoom_and_rotate_video(vid: videoType, zoom: float, rotate: float = 0) -> VideoType: ...
+
+"""Zoom and rotate each frame of video, return new video array"""
+
+
+def zoom_and_rotate_video_from_path(path: Union[Path, str], zoom: float, rotate: float = 0) -> None: ...
+
+"""Zoom and rotate video, save to out_path"""
+
+
+def zoom_and_rotate_video_from_dirs(path: Union[Path, str], zoom: float, rotate: float = 0) -> None: ...
+
+"""Zoom and rotate video all videos in directory, save to out_path"""

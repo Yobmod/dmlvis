@@ -15,10 +15,10 @@ def process_image(img: imageType, name: str, save_images: bool = True, verbosity
     edged = get_outlined_image(img)
     rotated = imutils.rotate_bound(edged, -90)
     skew = get_image_skew(rotated)
-    fixed = imutils.rotate_bound(edged, -skew)
+    fixed = imutils.rotate_bound(rotated, -skew)
     (x, y, w, h) = get_contour_lims(fixed)
     angle: float = calc_contact_angle(w, h)
-
+    w, h, angle = (round(w, 2), round(h, 2), round(angle, 2))
     if save_images:
         cv2.imwrite(Rf'..\data\{name}_edged.png', edged)
         mask = crop_outlined_image(edged)
