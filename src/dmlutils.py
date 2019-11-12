@@ -436,31 +436,25 @@ def zoom_and_rotate_video_from_dirs(in_path: Union[Path, str], zoom: float, out_
         zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
 
 
-def makeAnimatedGif(image_path: Union[Path, str], gif_name: str = "") -> None:
+def make_GIF(image_path: Union[Path, str]) -> None:
     """open all images in a dir and combine to a GIF."""
+    import imageio
+
     if isinstance(image_path, str):
         image_path = Path(image_path)
 
-    if not gif_name:
-        try:
-            gif_name = image_path.stem + ".gif"
-        except Exception:
-            print("makeAnimatedGif() function requires a gif_name if path is a dir")
-            raise
+    image_dir = image_path.parent
+    image_file = image_path.stem
+    gif_path = image_dir / f"{image_file}.gif"
 
-    # Grab the images and open them all for editing
-    img_files = sorted((image_file for image_file in image_path.glob(*'.png') if image_file))
-    images = [Image.open(img_f) for img_f in img_files]
-    print(f"{len(images)} images loaded from {image_path}")
-
-    # create gif
-    writeGif(gif_name, images, duration=0.2)
-    print(f"{gif_name} created from {len(images)} images. Saved to {image_path}")
-
-    #webbrowser.open('file://' + os.path.realpath(filename))
+    with imageio.get_writer(gif_path, mode='I') as writer:
+        img_files = sorted((img_file for img_file in image_dir.glob('*.png')))
+        for img_file in img_files:
+            writer.append_data(imageio.imread(img_file))
+    print(f"{len(img_files)} images loaded from {image_path}")
 
 
 if __name__ == "__main__":
     vid_path = Path(R"..\data")
     # zoom_and_rotate_video_from_dirs(vid_path, zoom=1.0, rotate=90)
-    makeAnimatedGif(R"..\data\ceria 5%Europium 300c dry 40", gif_name="ceria 5%Europium 300c dry 40")
+    make_GIF(R"..\data\ceria 5%Europium 300c dry 40\ceria 5%Europium 300c dry 40_0.png")

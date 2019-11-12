@@ -37,6 +37,7 @@ pysimplegui = "*"
 # sklearn = "*"
 numpy = ">=1.17.2"
 scipy = "*"
+imageio = "*"
 
 [requires]
 python_version = "3.7"  # 3.7 for opencv
