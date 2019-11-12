@@ -6,12 +6,19 @@ import cv2
 import math
 import imutils
 import pathlib
+from pathlib import Path
 from PIL import Image, ImageFont, ImageDraw
 from functools import lru_cache
+from images2gif import writeGif
+import os
+import sys
+import random
+import argparse
+# import webbrowser
 
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
-from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
+from mytypes import imageType, videoType, contourType, pointType, intArray, PILImage, colorType
 
 
 def set_res(cap: cv2.VideoCapture, resolution: Union[int, str]) -> str:
@@ -306,35 +313,154 @@ def savitzky_golay(y: Union[List, 'np._ArrayLike[float]'], window_size: int, ord
 
 
 def zoom_image(img: imageType, zoom: float) -> imageType:
-        # get the webcam image size
-    height, width, channels = image.shape
+    # get the webcam image size
+    height, width, channels = img.shape
+
+    mask = np.zeros((height, width), dtype=np.uint8)
+    new_top = int(height)
+    new_bttm = int(height * 0.0)
+    imageROI = cast(imageType, img[new_bttm:new_top, 0:width])
+    maskROI = mask[new_bttm:new_top, 0:width]
+    imageROI = cv2.bitwise_and(imageROI, imageROI, mask=maskROI)
 
     # prepare the crop
-    centerX, centerY = int(height / 2), int(width / 2)
-    radiusX, radiusY = int(zoom * height / 100), int(zoom * width / 100)
+    (centerX, centerY) = (int(height / 2), int(width / 2))
+    if zoom:
+        (radiusX, radiusY) = int(zoom * height / 2), int(zoom * width / 2)
+    else:
+        (radiusX, radiusY) = (int(height / 2), int(width / 2))
 
-    minX, maxX = centerX - radiusX, centerX + radiusX
-    minY, maxY = centerY - radiusY, centerY + radiusY
+    # minX, maxX = centerX - radiusX, centerX + radiusX
+    # minY, maxY = centerY - radiusY, centerY + radiusY
+    minY = int(width * 0.3)
+    maxY = int(width * 0.7)  # lower shift left
+    minX = int(height * 0.5)
+    maxX = int(height * 0.9)  # remove 0.2 and 0.4 = 0.6
 
     cropped = img[minX:maxX, minY:maxY]
     resized_cropped = cv2.resize(cropped, (width, height))
 
-    cv2.imshow('my webcam', resized_cropped)
+    return resized_cropped
 
 
-def zoom_imagefrom_path(path: Union[Path, str], zoom: float) -> imageType:
+def zoom_image_from_path(path: Union[Path, str], zoom: float) -> imageType: ...
 
 
-def zoom_and_rotate_video(vid: videoType, zoom: float, rotate: float = 0) -> VideoType: ...
+def zoom_and_rotate_video(vid: videoType, zoom: float, rotate: float = 0, show: bool = True, save_name: str = "") -> videoType:
+    """Zoom and rotate each frame of video, return new video array"""
+    frame_no = 0
+    out_folder_path = Path(fR'..\data\{save_name}')
+    out_folder_path.mkdir(exist_ok=True)
 
-"""Zoom and rotate each frame of video, return new video array"""
+    while vid.isOpened():  # and img.any():
+
+        frame_out: Tuple[bool, imageType] = vid.read()
+        # (ret, frame) = frame_out  ## loses typings :/
+        ret = frame_out[0]
+        frame = frame_out[1]
+
+        if ret is True:
+
+            if rotate:
+                rotated = imutils.rotate(frame, rotate)
+            else:
+                rotated = frame
+
+            cropped = zoom_image(rotated, zoom=zoom)
+
+            if frame_no % 500 == 0:
+                print(frame_no)
+                cv2.imwrite(str(out_folder_path) + fR'\{save_name}_{frame_no}.png', cropped)
+            frame_no += 1
+
+            if show:
+                cv2.imshow('Cropped window', cropped)
+
+            key: int = cv2.waitKey(10) & 0xFF
+            if key & 0xFF == ord("q"):  # quit camera if 'q' key is pressed
+                break
+        else:
+            break  # break if problem with a frame
+    else:
+        print("Error: Video not opened...")
+
+    vid.release()
+    cv2.destroyAllWindows()
 
 
-def zoom_and_rotate_video_from_path(path: Union[Path, str], zoom: float, rotate: float = 0) -> None: ...
+def load_video_from_path(path: Union[Path, str]) -> videoType:
+    """Zoom and rotate video, save to out_path"""
 
-"""Zoom and rotate video, save to out_path"""
+    if isinstance(path, str):
+        path = Path(path)
+    video_path = path.resolve()
+    if video_path.exists():
+        print(f"Video loaded from {video_path}")
+        vid: videoType = cv2.VideoCapture(str(video_path))
+    else:
+        sys.exit("Error: Video file not found...")
+
+    return vid
 
 
-def zoom_and_rotate_video_from_dirs(path: Union[Path, str], zoom: float, rotate: float = 0) -> None: ...
+def zoom_and_rotate_video_from_path(in_path: Union[Path, str], zoom: float, rotate: float = 0, save_name: str = "") -> None:
+    """Zoom and rotate video, save to out_path"""
+    if isinstance(in_path, str):
+        in_path = Path(in_path)
 
-"""Zoom and rotate video all videos in directory, save to out_path"""
+    if not save_name:
+        save_name = in_path.stem
+
+    vid = load_video_from_path(in_path)
+    zoom_and_rotate_video(vid, zoom=zoom, rotate=rotate, save_name=save_name)
+
+
+def zoom_and_rotate_video_from_dirs(in_path: Union[Path, str], zoom: float, out_path: Union[str, Path] = "", rotate: float = 0) -> None:
+    """get all .avi and mp4 files from folder and sub-folders as Paths and process each to out_path"""
+
+    if isinstance(in_path, str):
+        in_path = Path(in_path)
+
+    if not out_path:
+        out_path = in_path / "out"
+    elif isinstance(out_path, str):
+        out_path = Path(out_path)
+
+    # get all .avi files from folder and sub-folders as Paths
+    for video_path in in_path.glob('**/*.avi'):
+        video_stem = video_path.stem
+        zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
+
+    for video_path in in_path.glob('**/*.mp4'):
+        video_stem = video_path.stem
+        zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
+
+
+def makeAnimatedGif(image_path: Union[Path, str], gif_name: str = "") -> None:
+    """open all images in a dir and combine to a GIF."""
+    if isinstance(image_path, str):
+        image_path = Path(image_path)
+
+    if not gif_name:
+        try:
+            gif_name = image_path.stem + ".gif"
+        except Exception:
+            print("makeAnimatedGif() function requires a gif_name if path is a dir")
+            raise
+
+    # Grab the images and open them all for editing
+    img_files = sorted((image_file for image_file in image_path.glob(*'.png') if image_file))
+    images = [Image.open(img_f) for img_f in img_files]
+    print(f"{len(images)} images loaded from {image_path}")
+
+    # create gif
+    writeGif(gif_name, images, duration=0.2)
+    print(f"{gif_name} created from {len(images)} images. Saved to {image_path}")
+
+    #webbrowser.open('file://' + os.path.realpath(filename))
+
+
+if __name__ == "__main__":
+    vid_path = Path(R"..\data")
+    # zoom_and_rotate_video_from_dirs(vid_path, zoom=1.0, rotate=90)
+    makeAnimatedGif(R"..\data\ceria 5%Europium 300c dry 40", gif_name="ceria 5%Europium 300c dry 40")
