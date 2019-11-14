@@ -1,5 +1,7 @@
 """functions for image manipulation and processing"""
 # -*- coding: utf-8 -*-
+from typing import overload
+from typing_extensions import Literal
 from datetime import datetime
 import numpy as np
 import cv2
@@ -43,8 +45,8 @@ def set_res(cap: cv2.VideoCapture, resolution: Union[int, str]) -> str:
 def get_outlined_image(frame: imageType) -> imageType:
     grayed: imageType = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blurred: imageType = cv2.GaussianBlur(grayed, (9, 9), 0)
-    #cv2.imwrite(R'.\data\ceria_grey.png', grayed)
-    #cv2.imwrite(R'.\data\ceria_blurred.png', blurred)
+    # cv2.imwrite(R'.\data\ceria_grey.png', grayed)
+    # cv2.imwrite(R'.\data\ceria_blurred.png', blurred)
     # perform edge detection, then perform a dilation + erosion to close gaps
     edged: imageType = cv2.Canny(blurred, 20, 100)
     # cv2.imwrite(R'.\data\ceria_initedge.png', edged)
@@ -117,8 +119,8 @@ def get_image_skew(frame: imageType) -> float:
         # get point with x_min
         x_min_points: List[Tuple[int, int]] = [point for point in pxs_coords if point[0] == x_min]
         x_max_points: List[Tuple[int, int]] = [point for point in pxs_coords if point[0] == x_max]
-        y_of_max: float = sum([point[1] for point in x_max_points]) / len(x_max_points)
-        y_of_min: float = sum([point[1] for point in x_min_points]) / len(x_min_points)
+        y_of_max: float = sum(point[1] for point in x_max_points) / len(x_max_points)
+        y_of_min: float = sum(point[1] for point in x_min_points) / len(x_min_points)
 
         # x_max_point = (x_max, y_of_max)
         # print(x_min_points, x_max_points)
@@ -323,12 +325,14 @@ def zoom_image(img: imageType, zoom: float) -> imageType:
     maskROI = mask[new_bttm:new_top, 0:width]
     imageROI = cv2.bitwise_and(imageROI, imageROI, mask=maskROI)
 
+    """
     # prepare the crop
-    (centerX, centerY) = (int(height / 2), int(width / 2))
-    if zoom:
-        (radiusX, radiusY) = int(zoom * height / 2), int(zoom * width / 2)
-    else:
-        (radiusX, radiusY) = (int(height / 2), int(width / 2))
+    #(centerX, centerY) = (int(height / 2), int(width / 2))
+    #if zoom:
+        #(radiusX, radiusY) = int(zoom * height / 2), int(zoom * width / 2)
+    #else:
+        #(radiusX, radiusY) = (int(height / 2), int(width / 2))
+    """
 
     # minX, maxX = centerX - radiusX, centerX + radiusX
     # minY, maxY = centerY - radiusY, centerY + radiusY
@@ -426,12 +430,9 @@ def zoom_and_rotate_video_from_dirs(in_path: Union[Path, str], zoom: float, out_
     elif isinstance(out_path, str):
         out_path = Path(out_path)
 
+    from itertools import chain
     # get all .avi files from folder and sub-folders as Paths
-    for video_path in in_path.glob('**/*.avi'):
-        video_stem = video_path.stem
-        zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
-
-    for video_path in in_path.glob('**/*.mp4'):
+    for video_path in chain(in_path.glob('**/*.avi'), in_path.glob('**/*.mp4')):
         video_stem = video_path.stem
         zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
 
@@ -454,7 +455,76 @@ def make_GIF(image_path: Union[Path, str]) -> None:
     print(f"{len(img_files)} images loaded from {image_path}")
 
 
+@overload
+def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
+                                    channel: Literal['all']) -> Tuple[imageType, imageType, imageType]: ...
+
+
+@overload
+def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
+                                    channel: Literal['red', 'blue', 'green']) -> imageType: ...
+
+
+def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
+                                    channel: Literal['red', 'blue', 'green', 'all'] = 'all'
+                                    ) -> Union[imageType, Tuple[imageType, imageType, imageType]]:
+    pil_img = Image.fromarray(img_array)
+    (red, green, blue) = pil_img.split()
+    if channel == 'red':
+        return red
+    elif channel == 'green':
+        return green
+    elif channel == 'blue':
+        return blue
+    else:
+        return (red, green, blue)
+
+
+@overload
+def split_color_channels_from_path(image_path: Union[Path, str],
+                                   channel: Literal['red', 'blue', 'green']) -> imageType: ...
+
+
+@overload
+def split_color_channels_from_path(image_path: Union[Path, str],
+                                   channel: Literal['all']) -> Tuple[imageType, imageType, imageType]: ...
+
+
+def split_color_channels_from_path(image_path: Union[Path, str],
+                                   channel: Literal['red', 'blue', 'green', 'all'] = 'all'
+                                   ) -> Union[imageType, Tuple[imageType, imageType, imageType]]:
+    import imageio
+
+    if isinstance(image_path, str):
+        image_path = Path(image_path)
+
+    out_path = image_path.parent
+    name = image_path.stem
+
+    img = imageio.imread(image_path)
+    red, green, blue = split_color_channels_from_array(img, channel=channel)
+
+    if channel == 'red':
+        imageio.imwrite(out_path / f"{name}_red.jpg", red)
+        return red
+    elif channel == 'green':
+        imageio.imwrite(out_path / f"{name}_red.jpg", green)
+        return green
+    elif channel == 'blue':
+        imageio.imwrite(out_path / f"{name}_red.jpg", blue)
+        return blue
+    else:
+        imageio.imwrite(out_path / f"{name}_red.jpg", red)
+        imageio.imwrite(out_path / f"{name}_red.jpg", green)
+        imageio.imwrite(out_path / f"{name}_red.jpg", blue)
+        return (red, green, blue)
+
+
 if __name__ == "__main__":
-    vid_path = Path(R"..\data")
+    # vid_path=Path(R"..\data")
     # zoom_and_rotate_video_from_dirs(vid_path, zoom=1.0, rotate=90)
-    make_GIF(R"..\data\ceria 5%Europium 300c dry 40\ceria 5%Europium 300c dry 40_0.png")
+
+    # make_GIF(R"..\data\ceria 5%Europium 300c dry 40\ceria 5%Europium 300c dry 40_0.png")
+
+    image_path = Path(R"..\tests\test_images\test1.jpg")
+    split_color_channels_from_path(image_path, channel='all')
