@@ -11,12 +11,10 @@ import pathlib
 from pathlib import Path
 from PIL import Image, ImageFont, ImageDraw
 from functools import lru_cache
-from images2gif import writeGif
 import os
 import sys
 import random
 import argparse
-# import webbrowser
 
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
