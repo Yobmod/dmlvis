@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/yobmod/.local/share/virtualenvs/dmlvis-qPyarbVH/bin/python",
+    "python.pythonPath": "C:\\Users\\Customer\\.virtualenvs\\dmlvis-S9R8jaT6\\Scripts\\python.exe",
     "python.autoComplete.extraPaths": [
       //  ".",
         "./src",
