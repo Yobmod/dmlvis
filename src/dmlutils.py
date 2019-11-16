@@ -435,9 +435,11 @@ def zoom_and_rotate_video_from_dirs(in_path: Union[Path, str], zoom: float, out_
         zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
 
 
+
 def make_GIF(image_path: Union[Path, str]) -> None:
     """open all images in a dir and combine to a GIF."""
     import imageio
+    from pygifsicle import optimize
 
     if isinstance(image_path, str):
         image_path = Path(image_path)
@@ -445,12 +447,16 @@ def make_GIF(image_path: Union[Path, str]) -> None:
     image_dir = image_path.parent
     image_file = image_path.stem
     gif_path = image_dir / f"{image_file}.gif"
-
+    gif_path = Path(R".\xxxx.gif")
     with imageio.get_writer(gif_path, mode='I') as writer:
         img_files = sorted((img_file for img_file in image_dir.glob('*.png')))
         for img_file in img_files:
             writer.append_data(imageio.imread(img_file))
     print(f"{len(img_files)} images loaded from {image_path}")
+    try:
+        optimize(gif_path)
+    except Exception:
+        print("gifsicle not installed")
 
 
 @overload
