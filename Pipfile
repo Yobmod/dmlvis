@@ -19,7 +19,6 @@ flake8 = "*"
 flake8-comprehensions = "*"
 flake8-bugbear = "*"
 pdbpp = "*"
-pytype = "*"
 pyinstaller = "*"
 # numpy-stubs = {editable = true,git = "https://github.com/numpy/numpy-stubs.git"}
 

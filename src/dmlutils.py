@@ -351,7 +351,7 @@ def zoom_image_from_path(path: Union[Path, str], zoom: float) -> imageType: ...
 def zoom_and_rotate_video(vid: videoType, zoom: float, rotate: float = 0, show: bool = True, save_name: str = "") -> videoType:
     """Zoom and rotate each frame of video, return new video array"""
     frame_no = 0
-    out_folder_path = Path(fR'..\data\{save_name}')
+    out_folder_path = Path(f'../data/{save_name}')
     out_folder_path.mkdir(exist_ok=True)
 
     while vid.isOpened():  # and img.any():
@@ -447,7 +447,7 @@ def make_GIF(image_path: Union[Path, str]) -> None:
     image_dir = image_path.parent
     image_file = image_path.stem
     gif_path = image_dir / f"{image_file}.gif"
-    gif_path = Path(R".\xxxx.gif")
+    gif_path = Path("./xxxx.gif")
     with imageio.get_writer(gif_path, mode='I') as writer:
         img_files = sorted((img_file for img_file in image_dir.glob('*.png')))
         for img_file in img_files:
@@ -525,10 +525,10 @@ def split_color_channels_from_path(image_path: Union[Path, str],
 
 
 if __name__ == "__main__":
-    # vid_path=Path(R"..\data")
+    # vid_path=Path("../data")
     # zoom_and_rotate_video_from_dirs(vid_path, zoom=1.0, rotate=90)
 
     # make_GIF(R"..\data\ceria 5%Europium 300c dry 40\ceria 5%Europium 300c dry 40_0.png")
 
-    image_path = Path(R"..\tests\test_images\test1.jpg")
+    image_path = Path("../tests/test_images/test1.jpg")
     split_color_channels_from_path(image_path, channel='all')
