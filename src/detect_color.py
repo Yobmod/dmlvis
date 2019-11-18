@@ -4,36 +4,19 @@ import argparse
 import imutils
 import cv2
 
+from typing import Tuple, List
+from typing_extensions import Literal
+from mytypes import imageType
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
                 help="path to the input image")
 args = vars(ap.parse_args())
 
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-
 # load the image and resize it to a smaller factor so that
 # the shapes can be approximated better
-image = cv2.imread(args["image"])
+image: imageType = cv2.imread(args["image"])
 resized = imutils.resize(image, width=300)
 ratio = image.shape[0] / float(resized.shape[0])
 
@@ -51,30 +34,6 @@ cnts = imutils.grab_contours(cnts)
 # initialize the shape detector and color labeler
 sd = ShapeDetector()
 cl = ColorLabeler()
-
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
 
 # loop over the contours
 for c in cnts:
@@ -100,3 +59,29 @@ for c in cnts:
     # show the output image
     cv2.imshow("Image", image)
     cv2.waitKey(0)
+
+
+def get_image_color_all(image: imageType):
+    """get array of all colors in an image"""
+    """color_list = []
+       for x in image:
+            for y in x:
+                if y not in color_list:
+                    color_list.append(y)
+        color_list = {color for color in row for row in image}"""
+
+
+def get_image_color_average():
+    """get average color of image"""
+
+
+def UV_to_rgb(wavelength: Literal[365, 395]) -> Tuple[int, int, int]:
+    """get tuple of central color of UV wavelength image on white background"""
+    if wavelength == 365:
+        return (0, 0, 0)
+    elif wavelength == 395:
+        return (1, 1, 1)
+
+
+def filter_for_color(image: imageType, color: Tuple[int, int, int], variation: float = 0.1) -> imageType:
+    """remove all colors from image except given one plus some variation"""

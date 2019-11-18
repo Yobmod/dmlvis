@@ -1,9 +1,20 @@
 # dmlvis
 Computer vision with python
 
+Todo
+Colorsplitter for wavelength
+tkinter window with originl image, plus altered version.
+Buttons for:
+rgb split
+choose color filter
+gamma correct
+edge
+crop 10%
 
+plan:
 put walls for microscope slides to fit between, with markers (spheres?) to confirm distance: detect circles, calculate distance to camera
 gamma correct
+split colors
 watershed?
 Use auto canny detection
 discard contours that dont make sense

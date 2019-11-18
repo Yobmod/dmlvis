@@ -28,7 +28,7 @@ matplotlib = "*"  # brings numpy
 # typing-extensions = "*"
 pillow = "*"
 imutils = "*"
-pysimplegui = "*"
+# pysimplegui = "*"
 # pyyaml = ">=4.2"
 # python-dotenv = "*"
 # boltons = "*"
@@ -38,6 +38,7 @@ numpy = ">=1.17.2"
 scipy = "*"
 imageio = "*"
 pygifsicle = "*"
+colorpy = "*"
 
 [requires]
 python_version = "3.7"  # 3.7 for opencv
