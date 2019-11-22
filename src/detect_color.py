@@ -61,15 +61,13 @@ for c in cnts:
     cv2.waitKey(0)
 
 
-def get_image_color_all(image: imageType):
+def get_image_color_all(image: imageType, number: int = 0):
     """get array of all colors in an image"""
-    """color_list = []
-       for x in image:
-            for y in x:
-                if y not in color_list:
-                    color_list.append(y)
-        color_list = {color for color in row for row in image}"""
-
+    from collections import Counter
+    color_list = [tuple(color) for row in image for color in row]
+    color_count = Counter(color_list)
+    color_set = {tuple(color) for row in image for color in row}
+    return color_set
 
 def get_image_color_average():
     """get average color of image"""

@@ -34,11 +34,13 @@ imutils = "*"
 # boltons = "*"
 # keras = "*"
 # sklearn = "*"
-numpy = ">=1.17.2"
+numpy = "*"  # ">=1.17.2"
 scipy = "*"
 imageio = "*"
 pygifsicle = "*"
-colorpy = "*"
+ordered-set = "*"
+ordered-set-stubs = "*"
+plantcv = "*"
 
 [requires]
 python_version = "3.7"  # 3.7 for opencv
