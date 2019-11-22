@@ -41,6 +41,7 @@ pygifsicle = "*"
 ordered-set = "*"
 ordered-set-stubs = "*"
 plantcv = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.7"  # 3.7 for opencv
