@@ -1,25 +1,22 @@
 """functions for image manipulation and processing"""
 # -*- coding: utf-8 -*-
-from typing import overload
-from typing_extensions import Literal
+from __future__ import annotations
 from datetime import datetime
 import numpy as np
 import cv2
 import math
 import imutils
-import pathlib
 from pathlib import Path
 from PIL import Image, ImageFont, ImageDraw
-from functools import lru_cache
-import os
+# from functools import lru_cache
+# import os
 import sys
-import random
-import argparse
+# import random
+# import argparse
 
-from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
+from typing import Tuple, Union, List, cast, overload  # , Any, NewType, TypeVar, Iterable,
 from typing import Optional as Opt
-from typing_extensions import Final as Fin, Literal as Lit
-from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
+from typing_extensions import Literal as Lit  # , Final as Fin
 from mytypes import imageType, videoType, contourType, pointType, intArray, PILImage, colorType
 
 
@@ -174,7 +171,7 @@ def save_image_groups(frames_list: List[imageType], save_folder: str = "data", r
     # print(frames_list)
     today = datetime.today().strftime('%Y_%m_%d')
     now = datetime.now().strftime('%H%M%S')
-    name = pathlib.Path(f'./{save_folder}/images_{today}')
+    name = Path(f'./{save_folder}/images_{today}')
     name.mkdir(parents=True, exist_ok=True)
 
     if raw is True:
@@ -471,16 +468,16 @@ def make_GIF(image_path: Union[Path, str]) -> None:
 
 @overload
 def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
-                                    channel: Literal['all']) -> Tuple[imageType, imageType, imageType]: ...
+                                    channel: Lit['all']) -> Tuple[imageType, imageType, imageType]: ...
 
 
 @overload
 def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
-                                    channel: Literal['red', 'blue', 'green']) -> imageType: ...
+                                    channel: Lit['red', 'blue', 'green']) -> imageType: ...
 
 
 def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
-                                    channel: Literal['red', 'blue', 'green', 'all'] = 'all'
+                                    channel: Lit['red', 'blue', 'green', 'all'] = 'all'
                                     ) -> Union[imageType, Tuple[imageType, imageType, imageType]]:
     pil_img = Image.fromarray(img_array)
     (red, green, blue) = pil_img.split()
@@ -496,16 +493,16 @@ def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
 
 @overload
 def split_color_channels_from_path(image_path: Union[Path, str],
-                                   channel: Literal['red', 'blue', 'green']) -> imageType: ...
+                                   channel: Lit['red', 'blue', 'green']) -> imageType: ...
 
 
 @overload
 def split_color_channels_from_path(image_path: Union[Path, str],
-                                   channel: Literal['all']) -> Tuple[imageType, imageType, imageType]: ...
+                                   channel: Lit['all']) -> Tuple[imageType, imageType, imageType]: ...
 
 
 def split_color_channels_from_path(image_path: Union[Path, str],
-                                   channel: Literal['red', 'blue', 'green', 'all'] = 'all'
+                                   channel: Lit['red', 'blue', 'green', 'all'] = 'all'
                                    ) -> Union[imageType, Tuple[imageType, imageType, imageType]]:
     import imageio
 
