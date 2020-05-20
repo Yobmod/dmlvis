@@ -18,12 +18,7 @@ import argparse
 
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
-<<<<<<< HEAD
-from typing_extensions import Final as Fin, Literal as Lit
-from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
-=======
 from mytypes import imageType, videoType, contourType, pointType, intArray, PILImage, colorType
->>>>>>> 5f01ecdf9b78becb7faee78bf9680be3cecbb33e
 
 
 def set_res(cap: cv2.VideoCapture, resolution: Union[int, str]) -> str:
@@ -65,7 +60,6 @@ def get_largest_contour(frame: imageType) -> Opt[contourType]:
     result = cv2.findContours(frame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contours = result[0]
     if len(contours) > 0:
-        # if len(contours := result[0]) > 0:
         # grab the largest contour, then draw a mask for the pill l
         # cnt_areas = [cv2.contourArea(cntr) for cntr in contours]
         # c = max(cnt_areas)
@@ -78,13 +72,9 @@ def get_largest_contour(frame: imageType) -> Opt[contourType]:
 
 # @lru_cache(maxsize=128, typed=True)
 def get_contour_lims(frame: imageType) -> Tuple[int, int, int, int]:
-    """get measurements from pixels in edged image, as tuple of (x_position, y_poition,
-       width, height). If contour not found in image, returns tuple of zeros"""
+    "get left and right most pixels in edged image"
     largest_contour = get_largest_contour(frame)
-    if largest_contour is not None:
-        (x, y, w, h) = cv2.boundingRect(largest_contour)
-    else:
-        (x, y, w, h) = (0, 0, 0, 0)
+    (x, y, w, h) = cv2.boundingRect(largest_contour)
     return (x, y, w, h)
 
 
@@ -113,12 +103,7 @@ def drop_params(w: int, h: int) -> float:
 
 # @lru_cache(maxsize=128, typed=True)
 def get_image_skew(frame: imageType) -> float:
-<<<<<<< HEAD
-    """find contours in an edged image, calculate angle from horizontal of line bisecting
-       left and right-most pixels. If contour not found in image, returns zero"""
-=======
     """find contours in an edged image, and calculate angle from horizontal"""
->>>>>>> 5f01ecdf9b78becb7faee78bf9680be3cecbb33e
     largest_contour = get_largest_contour(frame)
     if largest_contour is not None:
         point: pointType
@@ -151,9 +136,8 @@ def get_image_skew(frame: imageType) -> float:
 
 
 # @lru_cache(maxsize=128, typed=True)
-def crop_outlined_image(frame: imageType) -> Opt[imageType]:
-    """find contours in an edged image, create a mask sized to largest contour and apply to image.
-    If contour not found in image, return None"""
+def crop_outlined_image(frame: imageType) -> imageType:
+    """find contours in an edged image, create a mask sized to largest contour and apply to image"""
     largest_contour = get_largest_contour(frame)
     if largest_contour is not None:
         mask = np.zeros(frame.shape, dtype=np.uint8)
@@ -173,7 +157,7 @@ def crop_outlined_image(frame: imageType) -> Opt[imageType]:
         # imageROI = imutils.rotate_bound(imageROI, -skew)
         return imageROI
     else:
-        return None
+        return frame
 
 
 def save_image_groups(frames_list: List[imageType], save_folder: str = "data", raw: bool = True, edged: bool = False, masked: bool = False) -> None:
@@ -224,11 +208,7 @@ def add_image_text(image: imageType, text: str, underline: bool = False) -> imag
     return text_image
 
 
-<<<<<<< HEAD
-def annot_image(img: imageType, ang: float, txt_size: int = 10) -> PILImage:
-=======
 def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: str = ".") -> None:
->>>>>>> 5f01ecdf9b78becb7faee78bf9680be3cecbb33e
     """convert opencv image array to PIL image, then annotate with contact angle"""
 
     pil_im_grey: PILImage = Image.fromarray(img)
@@ -243,10 +223,6 @@ def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: str =
         font = ImageFont.load_default()
     draw = ImageDraw.Draw(pil_im_color)
     draw.text(text_position, texty, font=font, fill=text_color)
-<<<<<<< HEAD
-    pil_im_color.save(R'.\data\ceria_annotated.bmp')
-    return pil_im_color
-=======
     pil_im_color.save(save_path)
 
 
@@ -556,4 +532,3 @@ if __name__ == "__main__":
 
     image_path = Path("../tests/test_images/test1.jpg")
     split_color_channels_from_path(image_path, channel='all')
->>>>>>> 5f01ecdf9b78becb7faee78bf9680be3cecbb33e

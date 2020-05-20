@@ -50,24 +50,10 @@ def process_image_from_path(path: Union[str, Path], name: str = None) -> Optiona
         return None
 
 
-<<<<<<< HEAD
-        edged = get_outlined_image(img)
-        mask = crop_outlined_image(edged)
-        cv2.imwrite(R'.\data\ceria_edged.png', edged)
-        cv2.imwrite(R'.\data\ceria_masked.png', mask)
-        (x, y, w, h) = get_contour_lims(edged)
-        if w > 0 and h > 0:
-            ang = calc_contact_angle(w, h)
-        # annotated = add_image_text(mask, f"C. angle = {ang:.1f}")
-        # cv2.imwrite(R'.\data\test_annotated.png', annotated)
-            annot_image(mask, ang, txt_size=10)
-        print("image processing done") 
-=======
 def display_image(img: imageType) -> None:
     while img is not None:
 
         cv2.imshow('test image', img)
->>>>>>> 5f01ecdf9b78becb7faee78bf9680be3cecbb33e
 
         key: int = cv2.waitKey(0) & 0xFF
         if key == 27 or key == ord("q"):         # wait for ESC key or Q to exit

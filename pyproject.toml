@@ -6,21 +6,42 @@ authors = ["dml"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-opencv-python = "^4.1"
-pillow = "^6.0"
-matplotlib = "^3.1"
-# keras = "^2.2"
-# scikit-learn = "^0.21.2"
+opencv-python = "*" # brings numpy
+matplotlib = "*"  # brings numpy
+# typing-extensions = "*"
+pillow = "*"
+imutils = "*"
+# pysimplegui = "*"
+# pyyaml = ">=4.2"
+# python-dotenv = "*"
+# boltons = "*"
+# keras = "*"
+# sklearn = "*"
+numpy = "*"  # ">=1.17.2"
+scipy = "*"
+imageio = "*"
+pygifsicle = "*"
+ordered-set = "*"
+ordered-set-stubs = "*"
+plantcv = "*"
+sklearn = "*"
 
 
 [tool.poetry.dev-dependencies]
-pylama = "^7.7"
-pytest = "^4.5"
-mypy = "^0.701.0"
-mccabe = "^0.6.1"
-pytest-cov = "^2.7"
-pytest-sugar = "^0.9.2"
-autopep8 = "^1.4"
-flake8 = "^3.7"
-pytest-xdist = "^1.28"
+cython = "*"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-sugar = "*"
+pytest-xdist = "*"
+pylama = "*"
+mccabe = "*"
+autopep8 = "*"
+flake8 = "*"
+flake8-comprehensions = "*"
+flake8-bugbear = "*"
+pdbpp = "*"
+pyinstaller = "*"
+# numpy-stubs = {editable = true,git = "https://github.com/numpy/numpy-stubs.git"}
+
 
