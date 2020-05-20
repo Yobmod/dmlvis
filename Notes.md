@@ -1,40 +1,38 @@
-cd
-mkdir
-ls
-rm
-rmdir
-make
+# TODO init
 
-clang -0 -gdb3 outputfile inputfile.c
+1. Optimise single image recognition (dropI.py) against a set of test images.
 
+2. apply image recognition to video stream. Fix memory issue (change loop / generator?)
 
+3. Create GUI (pysimpleGUI).
 
-
-
-Write functions as .py or .pyx
-    cython xxx.py(x) --> xxx.c
-
-Create compile.py that cythonizes .py(x)
-    python compile.py build_ext --inplace   --> xxx.c, xxx.platform.so/.pyd
-
-Import xxx.pyd to use
-    import xxx
-
-if .sp/.pyd present, prefers them
-
-Put all xxx.pyx / .c / .so / .pyd / build  into module folder yyy
-create empty __init__.py
-
-Import file xxx of module yyy
-    from yyy import xxx
-    xxx.zzz() to use
-
-Import all files
-    from yyy import *
-    xxx.zzz() to use
+    * textbox and buttons to load image / video files
+    * textbox and buttons to save data / graph files
+    * buttons to start process, close app
 
 
-put file into __init__.py
-Import module
-    import yyy
-    xxx.zzz() to use
+# TODO sec
+
+1. improve GUI
+
+    * checkboxes for save data / graphs / images
+    * canvas to display graph
+    * droplists / radio buttons to select settings
+    * fields to add title, conditions
+    * buttons to save / load settings
+
+2. Package (pyinstaller)
+
+
+# TODO tert
+
+1. Use ML (tensorflow)
+
+2. User login for settings
+
+3. Add upload to cloud / web options
+
+4. humidity data
+
+5. Cython / nim
+

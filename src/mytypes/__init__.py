@@ -1,7 +1,7 @@
 from typing import Type, TYPE_CHECKING, Tuple, Union, List, NewType  # , Any, NewType, TypeVar
 from PIL import Image
 import numpy as np
-
+from typing_extensions import Literal
 
 if TYPE_CHECKING:  # for mypy
     class ndarray(np.ndarray): ...
@@ -21,5 +21,13 @@ else:  # python doesnt allow ndarray subscriptable yet
 class PILImage(Image.Image): ...
 
 
-colorType = Union[Tuple[int, int, int, int], Tuple[int, int, int]]
+colorHSV = Tuple[float, float, float]
+colorRGB = Tuple[int, int, int]
+colorType = Union[colorHSV, colorRGB]
+
+RGBLit = Literal["RGB", "rgb"]
+HSVLit = Literal["HSV", "hsv"]
+colorSystemLit = Union[RGBLit, HSVLit]
+
+
 pointType = Tuple[int, int]

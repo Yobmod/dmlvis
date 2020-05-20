@@ -1,7 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\Yobmod\\.virtualenvs\\dmltests-0Rg3EQuB\\Scripts\\python.exe",
-    "python.linting.enabled": true,
-    "python.linting.mypyEnabled": true,
-    "python.linting.pylamaEnabled": true,
-    "python.linting.flake8Enabled": true
-}

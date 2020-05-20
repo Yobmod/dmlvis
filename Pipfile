@@ -4,6 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pip = "*"
+pipenv = "*"
 cython = "*"
 mypy = "*"
 pytest = "*"
@@ -11,9 +13,14 @@ pytest-cov = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
 pylama = "*"
+mccabe = "*"
 autopep8 = "*"
-# flake8 = "*"
+flake8 = "*"
+flake8-comprehensions = "*"
+flake8-bugbear = "*"
 pdbpp = "*"
+pyinstaller = "*"
+# numpy-stubs = {editable = true,git = "https://github.com/numpy/numpy-stubs.git"}
 
 [packages]
 opencv-python = "*" # brings numpy
@@ -21,13 +28,20 @@ matplotlib = "*"  # brings numpy
 # typing-extensions = "*"
 pillow = "*"
 imutils = "*"
-pysimplegui = "*"
-pyinstaller = "*"
+# pysimplegui = "*"
 # pyyaml = ">=4.2"
 # python-dotenv = "*"
 # boltons = "*"
 # keras = "*"
 # sklearn = "*"
+numpy = "*"  # ">=1.17.2"
+scipy = "*"
+imageio = "*"
+pygifsicle = "*"
+ordered-set = "*"
+ordered-set-stubs = "*"
+plantcv = "*"
+sklearn = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.7"  # 3.7 for opencv
