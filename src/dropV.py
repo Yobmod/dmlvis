@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 
 from dmlutils import get_outlined_image, crop_outlined_image, get_contour_lims, calc_contact_angle, get_image_skew, save_image_groups  # set_res
 
-from typing import List, Tuple
+from typing import List, Tuple, Optional as Opt
+from typing_extensions import Final as Fin
 from mytypes import videoType, imageType, floatArray  # , colorType, PILImage
 
 
@@ -28,7 +29,7 @@ if video_path.exists():
 else:
     sys.exit("Error: Video file not found...")
 
-fps: int = vid.get(cv2.CAP_PROP_FPS)      # OpenCV2 version 2 used "CV_CAP_PROP_FPS"
+fps: Fin[int] = vid.get(cv2.CAP_PROP_FPS)      # OpenCV2 version 2 used "CV_CAP_PROP_FPS"
 frameCount = int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
 duration = frameCount / fps  # seconds
 # print(duration)
@@ -87,7 +88,7 @@ for num, frame in enumerate(edged):
     skew = SKEW_list[num]
     fixed_frame = imutils.rotate_bound(frame, -skew)
     fixed_frames.append(fixed_frame)
-print(len(fixed_frames))
+print(len(fixed_frames)) 
 """
 fixed_frames = [imutils.rotate_bound(frame, -SKEW_list[num]) for num, frame in enumerate(edged)]
 
@@ -105,7 +106,7 @@ widths = [w for (w, h) in contour_lims]
 heights = [h for (w, h) in contour_lims]
 
 vid_times = [frame_no / fps for frame_no in range(len(raw_frames))]
-masked_fixed_frames: List[imageType] = [crop_outlined_image(frame) for frame in fixed_frames]
+masked_fixed_frames: List[Opt[imageType]] = [crop_outlined_image(frame) for frame in fixed_frames]
 # masked_vid.write(masked)
 
 # print(CA_list)
