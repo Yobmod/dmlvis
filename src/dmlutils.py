@@ -18,6 +18,8 @@ import argparse
 
 from typing import Tuple, Union, List, Iterable, cast  # , Any, NewType, TypeVar
 from typing import Optional as Opt
+from typing_extensions import Final as Fin, Literal as Lit
+from mytypes import imageType, contourType, pointType, intArray, PILImage, colorType
 from mytypes import imageType, videoType, contourType, pointType, intArray, PILImage, colorType
 
 
@@ -60,6 +62,7 @@ def get_largest_contour(frame: imageType) -> Opt[contourType]:
     result = cv2.findContours(frame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contours = result[0]
     if len(contours) > 0:
+        # if len(contours := result[0]) > 0:
         # grab the largest contour, then draw a mask for the pill l
         # cnt_areas = [cv2.contourArea(cntr) for cntr in contours]
         # c = max(cnt_areas)
@@ -72,9 +75,13 @@ def get_largest_contour(frame: imageType) -> Opt[contourType]:
 
 # @lru_cache(maxsize=128, typed=True)
 def get_contour_lims(frame: imageType) -> Tuple[int, int, int, int]:
-    "get left and right most pixels in edged image"
+    """get measurements from pixels in edged image, as tuple of (x_position, y_poition,
+       width, height). If contour not found in image, returns tuple of zeros"""
     largest_contour = get_largest_contour(frame)
-    (x, y, w, h) = cv2.boundingRect(largest_contour)
+    if largest_contour is not None:
+        (x, y, w, h) = cv2.boundingRect(largest_contour)
+    else:
+        (x, y, w, h) = (0, 0, 0, 0)
     return (x, y, w, h)
 
 
@@ -103,6 +110,8 @@ def drop_params(w: int, h: int) -> float:
 
 # @lru_cache(maxsize=128, typed=True)
 def get_image_skew(frame: imageType) -> float:
+    """find contours in an edged image, calculate angle from horizontal of line bisecting
+       left and right-most pixels. If contour not found in image, returns zero"""
     """find contours in an edged image, and calculate angle from horizontal"""
     largest_contour = get_largest_contour(frame)
     if largest_contour is not None:
@@ -136,8 +145,9 @@ def get_image_skew(frame: imageType) -> float:
 
 
 # @lru_cache(maxsize=128, typed=True)
-def crop_outlined_image(frame: imageType) -> imageType:
-    """find contours in an edged image, create a mask sized to largest contour and apply to image"""
+def crop_outlined_image(frame: imageType) -> Opt[imageType]:
+    """find contours in an edged image, create a mask sized to largest contour and apply to image.
+    If contour not found in image, return None"""
     largest_contour = get_largest_contour(frame)
     if largest_contour is not None:
         mask = np.zeros(frame.shape, dtype=np.uint8)
@@ -157,7 +167,7 @@ def crop_outlined_image(frame: imageType) -> imageType:
         # imageROI = imutils.rotate_bound(imageROI, -skew)
         return imageROI
     else:
-        return frame
+        return None
 
 
 def save_image_groups(frames_list: List[imageType], save_folder: str = "data", raw: bool = True, edged: bool = False, masked: bool = False) -> None:
@@ -208,7 +218,7 @@ def add_image_text(image: imageType, text: str, underline: bool = False) -> imag
     return text_image
 
 
-def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: str = ".") -> None:
+def annot_image(img: imageType, ang: float, txt_size: int = 10) -> PILImage:
     """convert opencv image array to PIL image, then annotate with contact angle"""
 
     pil_im_grey: PILImage = Image.fromarray(img)
@@ -223,7 +233,8 @@ def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: str =
         font = ImageFont.load_default()
     draw = ImageDraw.Draw(pil_im_color)
     draw.text(text_position, texty, font=font, fill=text_color)
-    pil_im_color.save(save_path)
+    pil_im_color.save(R'.\data\ceria_annotated.bmp')
+    return pil_im_color
 
 
 def savitzky_golay(y: Union[List, 'np._ArrayLike[float]'], window_size: int, order: int, deriv: int = 0, rate: int = 1) -> np.ndarray:
@@ -433,7 +444,6 @@ def zoom_and_rotate_video_from_dirs(in_path: Union[Path, str], zoom: float, out_
     for video_path in chain(in_path.glob('**/*.avi'), in_path.glob('**/*.mp4')):
         video_stem = video_path.stem
         zoom_and_rotate_video_from_path(video_path, zoom=zoom, rotate=rotate, save_name=video_stem)
-
 
 
 def make_GIF(image_path: Union[Path, str]) -> None:
