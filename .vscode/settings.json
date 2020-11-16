@@ -35,7 +35,7 @@
   "python.linting.pydocstyleEnabled": false,
   "python.linting.pylamaEnabled": true,
   "python.linting.pylintEnabled": false,
-  "python.pythonPath": "C:\\dev\\dmlvis\\.venv\\Scripts\\python.exe",
+  "python.pythonPath": "C:\\dev\\dmlvis\\.venv\\scripts\\python.exe",
   "python.testing.nosetestsEnabled": false,
   "python.testing.promptToConfigure": false,
   "python.testing.pytestEnabled": false,
