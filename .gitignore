@@ -1,6 +1,7 @@
 tokens.env
 pipfile.lock
 /data
+.venv/
 
 .mypy_cache/
 .pytest_cache/
