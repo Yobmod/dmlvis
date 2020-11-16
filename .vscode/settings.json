@@ -2,13 +2,7 @@
   "editor.formatOnSave": true,
 
   "python.pythonPath": "C:\\Users\\Yobmod\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\dmlvis-4BjvFWLh-py3.7\\Scripts\\python.exe",
-  "python.autoComplete.extraPaths": [
-    //  ".",
-    "./src",
-    "./tests",
-    "./src/mytypes"
-  ],
-  // "python.analysis.disabled": [        "inherit-non-class"    ],
+  "python.autoComplete.extraPaths": ["./src", "./tests", "./src/mytypes"],
 
   "python.testing.unittestEnabled": false,
   "python.testing.nosetestsEnabled": false,
@@ -59,7 +53,7 @@
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
   "git.autofetch": true,
-  // "python.analysis.downloadChannel": "beta",
+
   "python.formatting.provider": "autopep8",
-  "python.testing.promptToConfigure": false // "autopep8"
+  "python.testing.promptToConfigure": false
 }
