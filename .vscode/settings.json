@@ -41,5 +41,11 @@
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": false,
   "workbench.colorTheme": "Monokai-Contrast",
-  "workbench.iconTheme": "material-icon-theme"
+"workbench.iconTheme": "material-icon-theme",
+"python.languageServer": "Microsoft",
+"python.analysis.extraPaths": [
+  "./src",
+  "./tests",
+  "./src/mytypes"
+]
 }

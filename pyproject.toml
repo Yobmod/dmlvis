@@ -6,43 +6,130 @@ authors = ["dml"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-opencv-python = "*" # brings numpy
-matplotlib = "*"  # brings numpy
-# typing-extensions = "*"
-pillow = "*"
-imutils = "*"
-# pysimplegui = "*"
-# pyyaml = ">=4.2"
 python-dotenv = "*"
+typing-extensions = "*"
+
+
+# for tooling
+# more-itertools = "*"
+# func-timeout = "*"
+# toolz = "*"
+# cytoolz = "*"
 # boltons = "*"
+
+# for classes and containers
+# pydantic = "*"
+# attrs = "*"
+# cattrs = "*"
+# attrs-serde = "*"
+# dacite = "*"
+# dill = "*"
+# toml = "*"
+# pyyaml = "*"
+# ordered-set = "*"
+# bidict = "*"
+# pyfields = "*"
+# typeguard = "*"
+# autoclass = "*"
+
+
+# for cli
+# typer = {extras = ["all"], version = "*"}
+# termcolor = "*"
+# rapidtables = "*"
+# tabulate = "*"
+# colorama = "*"
+
+
+# if data
+# pandas = "*"
+numpy = "1.19.3" # {git = "https://github.com/numpy/numpy.git", branch="master"}
+matplotlib = "*"  # bring numpy, pillow
+# scipy = "*"
+# seaborn = "*"
+# pandas-alive = "*"
+# xarray = "*"
+# numba = {extras = ["all"], version = "*"}
+# scikit-learn = "*"
 # keras = "*"
 # sklearn = "*"
-numpy = "*"  # ">=1.19.4"
-# scipy = "*"
-# imageio = "*"
-# pygifsicle = "*"
-# ordered-set = "*"
-# ordered-set-stubs = "*"
-# plantcv = "*"
-# sklearn = "*"
+# biopython
+# chempy
+# jupyter = "*"
+# jupyter_contrib_nbextensions = "*"
+# jupyter_nbextensions_configurator = "*"
+# statsmodels = "*"
+# ipykernel = "*"
+# jupyterlab = "*"
+
+
+# if images / sound
+pillow ="*"
+opencv-python = "*"
+imutils = "*"
+# imageio = "*"  # brings pillow
+# mutagen = "*"
+
+
+
+# for web
+# fastapi = {extras = ["all"], version = "*"} # bring uvicorn, aiofiles, pydantic, startlette
+# jinja2 = "*"
+# sqlalchemy = "*"
+# alembic = "*"
+# sqlalchemy-stubs = "*"
+# django = "*"
+# mechanicalsoup = "*"
+
+# for gui
+# pygame = "*"
+# pysimplegui = "*"
+# pyside2 = "*"
+# pyqtgraph = "*"
+
+
+# databases / queues
+# redis
+# celery
+
+# for specifics
+# pysmartthings = "*"
+# fitnesspal = "*"
+# pysrim = "*"
 
 
 [tool.poetry.dev-dependencies]
-# cython = "*"
-mypy = "*"
+# cython = "*"  # {git = "https://github.com/cython/cython.git", branch="master"}
 pytest = "*"
+mypy = "*"
 pytest-cov = "*"
+pytest-mypy = "*"
 pytest-sugar = "*"
 pytest-xdist = "*"
 pylama = "*"
-mccabe = "*"
 autopep8 = "*"
 flake8 = "*"
 flake8-comprehensions = "*"
 flake8-bugbear = "*"
-# pdbpp = "*"
-# pyinstaller = "*"
+pdbpp = "*"
 gitpython = "*"
+flake8-annotations-complexity = "*"
+# pyinstaller = "*"
+GitPython = "*"
+
+[virtualenvs]
+create = true
+in-project = true
 
 
+[build-system]
+requires = ["poetry>=1.1.4"]
+build-backend = "poetry.masonry.api"
+
+
+[tool.pytest.ini_options]
+testpaths = [    
+    "tests",
+    "integration",
+    ]
 
