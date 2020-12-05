@@ -186,7 +186,7 @@ def save_image_groups(frames_list: List[imageType], save_folder: str = "data", r
                 cv2.imwrite(f'{name}/{index}_edged_{now}.png', frame)
 
         if masked is True:
-            masked_frames: List[imageType] = [crop_outlined_image(frame) for frame in edged_frames]
+            masked_frames = [crop for frame in edged_frames if (crop := crop_outlined_image(frame))]
             for index, frame in enumerate(masked_frames):
                 cv2.imwrite(f'{name}/{index}_mask_{now}.png', frame)
 
@@ -215,7 +215,7 @@ def add_image_text(image: imageType, text: str, underline: bool = False) -> imag
     return text_image
 
 
-def annot_image(img: imageType, ang: float, txt_size: int = 10) -> PILImage:
+def annot_image(img: imageType, ang: float, txt_size: int = 10, save_path: Union[str, Path] = "") -> PILImage:
     """convert opencv image array to PIL image, then annotate with contact angle"""
 
     pil_im_grey: PILImage = Image.fromarray(img)
@@ -230,7 +230,10 @@ def annot_image(img: imageType, ang: float, txt_size: int = 10) -> PILImage:
         font = ImageFont.load_default()
     draw = ImageDraw.Draw(pil_im_color)
     draw.text(text_position, texty, font=font, fill=text_color)
-    pil_im_color.save(R'.\data\ceria_annotated.bmp')
+    if save_path:
+        pil_im_color.save(save_path)
+    else:
+        pil_im_color.save(R'.\data\ceria_annotated.bmp')
     return pil_im_color
 
 
@@ -348,7 +351,7 @@ def zoom_image(img: imageType, zoom: float) -> imageType:
     maxX = int(height * 0.9)  # remove 0.2 and 0.4 = 0.6
 
     cropped = img[minX:maxX, minY:maxY]
-    resized_cropped = cv2.resize(cropped, (width, height))
+    resized_cropped: imageType = cv2.resize(cropped, (width, height))
 
     return resized_cropped
 
@@ -356,8 +359,12 @@ def zoom_image(img: imageType, zoom: float) -> imageType:
 def zoom_image_from_path(path: Union[Path, str], zoom: float) -> imageType: ...
 
 
-def zoom_and_rotate_video(vid: videoType, zoom: float, rotate: float = 0, show: bool = True, save_name: str = "") -> videoType:
-    """Zoom and rotate each frame of video, return new video array"""
+def zoom_and_rotate_video(vid: videoType,
+                          zoom: float,
+                          rotate: float = 0,
+                          show: bool = True,
+                          save_name: str = "") -> None:
+    """Zoom and rotate each frame of video, save new array (return new video array?)"""
     frame_no = 0
     out_folder_path = Path(f'../data/{save_name}')
     out_folder_path.mkdir(exist_ok=True)
@@ -480,7 +487,11 @@ def split_color_channels_from_array(img_array: 'np.ndarray[np.ndarray[int]]',
                                     channel: Lit['red', 'blue', 'green', 'all'] = 'all'
                                     ) -> Union[imageType, Tuple[imageType, imageType, imageType]]:
     pil_img = Image.fromarray(img_array)
+    red: imageType
+    green: imageType
+    blue: imageType
     (red, green, blue) = pil_img.split()
+
     if channel == 'red':
         return red
     elif channel == 'green':

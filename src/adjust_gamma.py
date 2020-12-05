@@ -13,7 +13,8 @@ def adjust_gamma(image: imageType, gamma: float = 1.0) -> imageType:
                       for i in np.arange(0, 256)]).astype("uint8")
 
     # apply gamma correction using the lookup table
-    return cv2.LUT(image, table)
+    res: imageType = cv2.LUT(image, table)
+    return res
 
 
 # construct the argument parse and parse the arguments

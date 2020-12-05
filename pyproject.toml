@@ -45,7 +45,7 @@ typing-extensions = "*"
 # pandas = "*"
 numpy = "1.19.3" # {git = "https://github.com/numpy/numpy.git", branch="master"}
 matplotlib = "*"  # bring numpy, pillow
-# scipy = "*"
+scipy = "*"
 # seaborn = "*"
 # pandas-alive = "*"
 # xarray = "*"
@@ -67,7 +67,8 @@ matplotlib = "*"  # bring numpy, pillow
 pillow ="*"
 opencv-python = "*"
 imutils = "*"
-# imageio = "*"  # brings pillow
+imageio = "*"  # brings pillow
+pygifsicle = "*"
 # mutagen = "*"
 
 

@@ -36,7 +36,6 @@ for c in cnts:
 
     # show the image
     cv2.imshow("Image", image)
-    
+
     # add center labels sequentially
     cv2.waitKey(0)  # after each key press
-

@@ -145,6 +145,8 @@ def process_videodata(raw_data: 'np.ndarray[float]', flatten: Literal['high', 'm
         (b, a) = butter(1, 0.02)
     elif flatten == 'low':
         (b, a) = butter(1, 0.05)
+    else:
+        raise ValueError()
 
     try:
         # median window filtered
@@ -169,7 +171,7 @@ def process_videodata(raw_data: 'np.ndarray[float]', flatten: Literal['high', 'm
 
 
 def print_video_data(data: 'np.ndarray[float]',
-                     out_path: Union[str, Path] = None,
+                     out_path: Union[str, Path] = "",
                      out_filename: str = "out",
                      combine: bool = True,
                      dots: Collection = "raw, medfilt",
@@ -241,7 +243,7 @@ def print_video_data(data: 'np.ndarray[float]',
 
 
 def print_video_data_from_csv(file_in: Union[str, Path],
-                              out_path: Union[str, Path] = None,
+                              out_path: Union[str, Path] = "",
                               out_filename: str = "out",
                               *,
                               combine: bool = False,

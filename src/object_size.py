@@ -11,7 +11,7 @@ from mytypes import pointType, contourType
 
 def midpoint(ptA: pointType, ptB: pointType) -> pointType:
     """return midpoint coords from 2 given points (as Tuples of ints)"""
-    return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
+    return (int((ptA[0] + ptB[0]) * 0.5), int((ptA[1] + ptB[1]) * 0.5))
 
 
 # construct the argument parse and parse the arguments

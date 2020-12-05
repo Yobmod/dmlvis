@@ -4,7 +4,7 @@ import argparse
 import imutils
 import cv2
 
-from typing import Tuple, List
+from typing import Tuple, List, Set, cast
 from typing_extensions import Literal
 from mytypes import imageType
 
@@ -61,16 +61,18 @@ for c in cnts:
     cv2.waitKey(0)
 
 
-def get_image_color_all(image: imageType, number: int = 0):
+def get_image_color_all(image: imageType, number: int = 0) -> Set[Tuple[int, int, int]]:
     """get array of all colors in an image"""
     from collections import Counter
     color_list = [tuple(color) for row in image for color in row]
     color_count = Counter(color_list)
     color_set = {tuple(color) for row in image for color in row}
-    return color_set
+    return cast(Set[Tuple[int, int, int]], color_set)
 
-def get_image_color_average():
+
+def get_image_color_average() -> None:
     """get average color of image"""
+    ...
 
 
 def UV_to_rgb(wavelength: Literal[365, 395]) -> Tuple[int, int, int]:
